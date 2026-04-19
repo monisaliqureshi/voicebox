@@ -200,6 +200,8 @@ async def add_profile_sample(
     audio_path: str,
     reference_text: str,
     db: Session,
+    *,
+    denoise: bool = False,
 ) -> ProfileSampleResponse:
     """
     Add a sample to a voice profile.
@@ -209,6 +211,7 @@ async def add_profile_sample(
         audio_path: Path to temporary audio file
         reference_text: Transcript of audio
         db: Database session
+        denoise: If True, apply spectral noise reduction before saving.
 
     Returns:
         Created sample
@@ -225,6 +228,10 @@ async def add_profile_sample(
     )
     if not is_valid:
         raise ValueError(f"Invalid reference audio: {error_msg}")
+
+    if denoise:
+        from ..utils.audio import denoise_audio
+        audio = await asyncio.to_thread(denoise_audio, audio, sr)
 
     sample_id = str(uuid.uuid4())
     profile_dir = config.get_profiles_dir() / profile_id

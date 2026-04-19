@@ -199,6 +199,30 @@ def trim_tts_output(
     return trimmed
 
 
+def denoise_audio(
+    audio: np.ndarray,
+    sample_rate: int,
+    stationary: bool = True,
+) -> np.ndarray:
+    """
+    Remove background noise from an audio array using spectral gating.
+
+    Args:
+        audio: Input audio array (mono float32)
+        sample_rate: Sample rate in Hz
+        stationary: If True, uses stationary noise reduction (fast, best for
+            constant noise such as AC hum or fan noise).  If False, uses
+            non-stationary reduction (slower, better for variable noise).
+
+    Returns:
+        Denoised audio as a float32 NumPy array.
+    """
+    import noisereduce as nr
+
+    denoised = nr.reduce_noise(y=audio, sr=sample_rate, stationary=stationary)
+    return denoised.astype(np.float32)
+
+
 def validate_reference_audio(
     audio_path: str,
     min_duration: float = 2.0,

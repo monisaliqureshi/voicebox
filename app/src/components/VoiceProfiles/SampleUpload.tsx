@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ const sampleSchema = z.object({
     .string()
     .min(1, 'Reference text is required')
     .max(1000, 'Reference text must be less than 1000 characters'),
+  denoise: z.boolean().default(false),
 });
 
 type SampleFormValues = z.infer<typeof sampleSchema>;
@@ -61,6 +63,7 @@ export function SampleUpload({ profileId, open, onOpenChange }: SampleUploadProp
     resolver: zodResolver(sampleSchema),
     defaultValues: {
       referenceText: '',
+      denoise: false,
     },
   });
 
@@ -172,6 +175,7 @@ export function SampleUpload({ profileId, open, onOpenChange }: SampleUploadProp
         profileId,
         file: data.file,
         referenceText: data.referenceText,
+        denoise: data.denoise,
       });
 
       toast({
@@ -313,6 +317,34 @@ export function SampleUpload({ profileId, open, onOpenChange }: SampleUploadProp
                 </TabsContent>
               )}
             </Tabs>
+
+            <FormField
+              control={form.control}
+              name="denoise"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-start gap-3">
+                    <FormControl>
+                      <Checkbox
+                        id="denoise-checkbox"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-0.5"
+                      />
+                    </FormControl>
+                    <div className="flex flex-col gap-0.5">
+                      <FormLabel htmlFor="denoise-checkbox" className="cursor-pointer">
+                        Remove background noise
+                      </FormLabel>
+                      <p className="text-xs text-muted-foreground">
+                        Applies spectral noise gating to reduce hum, static, or room noise. Adds a
+                        short processing step.
+                      </p>
+                    </div>
+                  </div>
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

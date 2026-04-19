@@ -155,6 +155,7 @@ async def add_profile_sample(
     profile_id: str,
     file: UploadFile = File(...),
     reference_text: str = Form(...),
+    denoise: bool = Form(False),
     db: Session = Depends(get_db),
 ):
     """Add a sample to a voice profile."""
@@ -181,6 +182,7 @@ async def add_profile_sample(
             tmp_path,
             reference_text,
             db,
+            denoise=denoise,
         )
         return sample
     except ValueError as e:
