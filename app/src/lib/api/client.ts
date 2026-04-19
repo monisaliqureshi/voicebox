@@ -119,11 +119,13 @@ class ApiClient {
     profileId: string,
     file: File,
     referenceText: string,
+    denoise: boolean = false,
   ): Promise<ProfileSampleResponse> {
     const url = `${this.getBaseUrl()}/profiles/${profileId}/samples`;
     const formData = new FormData();
     formData.append('file', file);
     formData.append('reference_text', referenceText);
+    formData.append('denoise', String(denoise));
 
     const response = await fetch(url, {
       method: 'POST',
